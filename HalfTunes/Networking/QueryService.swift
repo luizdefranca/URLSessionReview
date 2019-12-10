@@ -38,6 +38,7 @@ class QueryService {
   // MARK: - Constants
   //
   let defaultSession = URLSession(configuration: .default)
+  let baseURL : String = "https://itunes.apple.com/search"
   
   //
   // MARK: - Variables And Properties
@@ -58,9 +59,67 @@ class QueryService {
   //
   func getSearchResults(searchTerm: String, completion: @escaping QueryResult) {
     // TODO 3
+
+    /*
+     For a new user query, you cancel any data task that already exists, because you want to reuse
+     the data task object for this new query
+     */
+    dataTask?.cancel()
+
+    /*
+     To include the user’s search string in the query URL, you create URLComponents from the iTunes
+     Search base URL, then set its query string. This ensures that your search string uses escaped
+     characters.
+     */
+    if var urlComponents = URLComponents(string: baseURL) {
+      urlComponents.query = "media=music&entity=song&term=\(searchTerm)"
+
+      /*
+       The url property of urlComponents is optional, so you unwrap it to url and return early
+       if it’s nil.
+       */
+
+      guard let url = urlComponents.url else {
+        return
+      }
+
+      /*
+       From the session you created, you initialize a URLSessionDataTask with the query url and a
+       completion handler to call when the data task completes.
+       */
+      dataTask = defaultSession.dataTask(with: url,
+           completionHandler: { [weak self] data, response, error in
+
+            defer {
+              self?.dataTask = nil
+            }
+
+            /*
+             If the request is successful, you call the helper method updateSearchResults, which
+             parses the response data into the tracks array.
+             */
+            if let error = error {
+              self?.errorMessage += "Data error: " +
+              error.localizedDescription + "\n"
+            } else if let data = data,
+              let response = response as? HTTPURLResponse,
+              response.statusCode == 200 {
+              self?.updateSearchResults(data)
+            }
+      })
+    }
+
+    /*
+     You switch to the main queue to pass tracks to the completion handler.
+     */
+
     DispatchQueue.main.async {
       completion(self.tracks, self.errorMessage)
     }
+    /*
+     All tasks start in a suspended state by default. Calling resume() starts the data task.
+     */
+    dataTask?.resume()
   }
   
   //
@@ -82,16 +141,16 @@ class QueryService {
       return
     }
     
-    var index = 0
+//    var index = 0
     
-    for trackDictionary in array {
+    for (index, trackDictionary) in array.enumerated() {
       if let trackDictionary = trackDictionary as? JSONDictionary,
         let previewURLString = trackDictionary["previewUrl"] as? String,
         let previewURL = URL(string: previewURLString),
         let name = trackDictionary["trackName"] as? String,
         let artist = trackDictionary["artistName"] as? String {
           tracks.append(Track(name: name, artist: artist, previewURL: previewURL, index: index))
-          index += 1
+//          index += 1
       } else {
         errorMessage += "Problem parsing trackDictionary\n"
       }

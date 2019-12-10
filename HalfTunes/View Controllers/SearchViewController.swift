@@ -236,5 +236,48 @@ extension SearchViewController: URLSessionDownloadDelegate {
   func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
                   didFinishDownloadingTo location: URL) {
     print("Finished download to \(location)")
+
+    /*
+     You extract the original request URL from the task, look up the corresponding Download in your
+     active downloads and remove it from that dictionary.
+     */
+    guard let sourceURL = downloadTask.originalRequest?.url else {
+      return
+    }
+    let download = downloadService.activeDownloads[sourceURL]
+    downloadService.activeDownloads[sourceURL] = nil
+
+    /*
+     You then pass the URL to localFilePath(for:), which generates a permanent local file path to
+     save to by appending the lastPathComponent of the URL (the file name and extension of the file)
+     to the path of the app’s Documents directory.
+     */
+    let destinationURL = localFilePath(for: sourceURL)
+    print(destinationURL)
+
+    /*
+     Using fileManager, you move the downloaded file from its temporary file location to the desired
+     destination file path, first clearing out any item at that location before you start the copy
+     task. You also set the download track’s downloaded property to true.
+     */
+    let fileManager = FileManager.default
+    try? fileManager.removeItem(at: destinationURL)
+
+    do {
+      try fileManager.copyItem(at: location, to: destinationURL)
+      download?.track.downloaded = true
+    } catch let error {
+      print("Could not copy file to disk: \(error.localizedDescription)" +
+        "/n\(#file) - \(#function) - \(#line)")
+    }
+
+    /*
+     Finally, you use the download track’s index property to reload the corresponding cell.
+     */
+    if let index = download?.track.index {
+      DispatchQueue.main.async { [weak self] in
+        self?.reload(index)
+      }
+    }
   }
 }

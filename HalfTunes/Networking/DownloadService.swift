@@ -39,7 +39,11 @@ class DownloadService {
   // MARK: - Variables And Properties
   //
   // TODO 4
-  
+  /*
+   This dictionary will maintain a mapping between a URL and its active Download, if any
+   */
+  var activeDownloads : [URL: Download] = [:]
+
   /// SearchViewController creates downloadsSession
   var downloadsSession: URLSession!
   

@@ -116,5 +116,11 @@ class TrackCell: UITableViewCell {
   }
   
   // TODO 16
+
+  func updateDisplay(progress: Float, totalSize: String){
+
+    self.progressView.progress = progress
+    self.progressLabel.text = String(format: "%.1f of %@", progress * 100, totalSize)
+  }
   
 }

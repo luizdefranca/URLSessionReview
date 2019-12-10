@@ -160,7 +160,7 @@ extension SearchViewController: UITableViewDataSource {
     
     let track = searchResults[indexPath.row]
     // TODO 13
-    cell.configure(track: track, downloaded: track.downloaded)
+    cell.configure(track: track, downloaded: track.downloaded, download: downloadService.activeDownloads[track.previewURL])
     
     return cell
   }

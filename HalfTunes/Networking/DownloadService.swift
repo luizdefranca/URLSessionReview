@@ -63,6 +63,14 @@ class DownloadService {
   
   // TODO 10
   func pauseDownload(_ track: Track) {
+
+    guard let download = activeDownloads[track.previewURL] else {
+      return
+    }
+    download.task?.cancel(byProducingResumeData: { (data) in
+      download.resumeData = data
+    })
+    download.isDownloading = false
   }
   
   // TODO 11

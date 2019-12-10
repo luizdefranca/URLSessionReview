@@ -75,6 +75,18 @@ class DownloadService {
   
   // TODO 11
   func resumeDownload(_ track: Track) {
+    guard let download = activeDownloads[track.previewURL] else {
+      return
+    }
+
+    if let resumeData = download.resumeData {
+      download.task = downloadsSession.downloadTask(withResumeData: resumeData)
+    } else {
+      download.task = downloadsSession.downloadTask(with: download.track.previewURL)
+    }
+    download.task?.resume()
+    download.isDownloading = true
+
   }
   
   // TODO 8

@@ -37,7 +37,7 @@ class QueryService {
   //
   // MARK: - Constants
   //
-  // TODO 1
+  let defaultSession = URLSession(configuration: .default)
   
   //
   // MARK: - Variables And Properties
@@ -45,6 +45,7 @@ class QueryService {
   // TODO 2
   var errorMessage = ""
   var tracks: [Track] = []
+  var dataTask: URLSessionDataTask?
   
   //
   // MARK: - Type Alias

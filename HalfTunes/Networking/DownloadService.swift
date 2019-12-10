@@ -65,5 +65,32 @@ class DownloadService {
   
   // TODO 8
   func startDownload(_ track: Track) {
+
+    /*
+     You first initialize a Download with the track.
+     */
+    let download = Download(track: track)
+
+    /*
+     Using your new session object, you create a URLSessionDownloadTask with the track’s preview
+     URL and set it to the task property of the Download.
+     */
+
+    download.task = downloadsSession.downloadTask(with: track.previewURL)
+
+    /*
+     You start the download task by calling resume() on it.
+     */
+    download.task?.resume()
+
+    /*
+     You indicate that the download is in progress.
+     */
+    download.isDownloading = true
+
+    /*
+     Finally, you map the download URL to its Download in activeDownloads
+     */
+    activeDownloads[download.track.previewURL] = download
   }
 }

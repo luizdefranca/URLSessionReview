@@ -53,6 +53,12 @@ class DownloadService {
   //
   // TODO 9
   func cancelDownload(_ track: Track) {
+    guard let download = activeDownloads[track.previewURL] else {
+      return
+    }
+
+    download.task?.cancel()
+    activeDownloads[track.previewURL] = nil
   }
   
   // TODO 10

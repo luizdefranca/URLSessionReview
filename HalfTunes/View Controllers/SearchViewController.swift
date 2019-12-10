@@ -54,6 +54,10 @@ class SearchViewController: UIViewController {
   // MARK: - Variables And Properties
   //
   // TODO 6
+  lazy var downloadsSession: URLSession = {
+    let configuration = URLSessionConfiguration.default
+    return URLSession(configuration: configuration)
+  }()
   
   var searchResults: [Track] = []
   

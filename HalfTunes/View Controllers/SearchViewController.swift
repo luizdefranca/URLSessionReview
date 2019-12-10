@@ -223,3 +223,10 @@ extension SearchViewController: TrackCellDelegate {
 // TODO 19
 
 // TODO 5
+extension SearchViewController: URLSessionDownloadDelegate {
+
+  func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                  didFinishDownloadingTo location: URL) {
+    print("Finished download to \(location)")
+  }
+}

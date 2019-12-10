@@ -56,9 +56,9 @@ class SearchViewController: UIViewController {
   // TODO 6
   lazy var downloadsSession: URLSession = {
     let configuration = URLSessionConfiguration.default
-    return URLSession(configuration: configuration)
+    return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
   }()
-  
+
   var searchResults: [Track] = []
   
   lazy var tapRecognizer: UITapGestureRecognizer = {
@@ -103,6 +103,10 @@ class SearchViewController: UIViewController {
     tableView.tableFooterView = UIView()
     
     // TODO 7
+    /*
+     This sets the downloadsSession property of DownloadService to the session you just defined.
+     */
+    downloadService.downloadsSession = downloadsSession
   }
   
 }

@@ -280,4 +280,47 @@ extension SearchViewController: URLSessionDownloadDelegate {
       }
     }
   }
+
+  func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                  didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
+                  totalBytesExpectedToWrite: Int64) {
+
+    /*
+     You extract the URL of the provided downloadTask and use it to find the matching Download in
+     your dictionary of active downloads.
+     */
+    guard let url = downloadTask.originalRequest?.url,
+      let download = downloadService.activeDownloads[url] else {
+        return
+    }
+
+    /*
+     The method also provides the total bytes you have written and the total bytes you expect to
+     write. You calculate the progress as the ratio of these two values and save the result in
+     Download. The track cell will use this value to update the progress view.
+     */
+
+    download.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+
+    /*
+     ByteCountFormatter takes a byte value and generates a human-readable string showing the total
+     download file size. You’ll use this string to show the size of the download alongside the
+     percentage complete.
+     */
+    let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite,
+                                              countStyle: .file)
+
+    /*
+     Finally, you find the cell responsible for displaying the Track and call the cell’s helper
+     method to update its progress view and progress label with the values derived from the
+     previous steps. This involves the UI, so you do it on the main queue.
+     */
+    DispatchQueue.main.async {
+      let indexPath = IndexPath(row: download.track.index, section: 0)
+      if let trackCell = self.tableView.cellForRow(at: indexPath) as? TrackCell {
+        trackCell.updateDisplay(progress: download.progress, totalSize: totalSize)
+      }
+
+    }
+  }
 }

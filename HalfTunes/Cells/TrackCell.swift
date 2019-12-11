@@ -103,12 +103,15 @@ class TrackCell: UITableViewCell {
     if let download = download {
       showDownloadControls = true
       let title = download.isDownloading ? "Pause" : "Resume"
+      progressLabel.text = download.isDownloading ? "Downloading..." : "Pause"
       pauseButton.setTitle(title, for: .normal)
     }
 
+
     pauseButton.isHidden = !showDownloadControls
     cancelButton.isHidden = !showDownloadControls
-
+    progressView.isHidden = !showDownloadControls
+    progressLabel.isHidden = !showDownloadControls
 
     // If the track is already downloaded, enable cell selection and hide the Download button.
     selectionStyle = downloaded ? UITableViewCell.SelectionStyle.gray : UITableViewCell.SelectionStyle.none
